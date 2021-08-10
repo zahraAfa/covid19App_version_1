@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Covid-19</title>
+    <link rel="icon" href="https://www.moh.gov.my/moh/resources/pengurusan/logo_baru_kkm.jpg">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <style>
+    body {
+      padding: 0%;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    .body {
+      margin: auto;
+      width: 90%;
+      align-items: center;
+    }
+    .hero {
+      background-color: rgb(150, 164, 245);
+      height: 10vh;
+    }
+    .center_div {
+      padding: 2rem;
+      margin: auto;
+      text-align: center;
+    }
+    .small{
+        font-size: smaller;
+    }
+  </style>
+  <body>
+    <div class="body">
+      <div class="hero"></div>
+      <div class="center_div">
+        <div>
+          <a class="btn btn-primary" href="insert.html">Add New Patient</a>
+        </div>
+      </div>
+      <table class="table">
+        <h3>Table List</h3>
+        <th>
+          <tr>
+            <td>ID</td>
+            <td>Name</td>
+            <td>Admission</td>
+            <td>Status</td>
+            <td>Date</td>
+            <td>Action</td>
+          </tr>
+        </th>
+        <tbody id="all_patient"></tbody>
+      </table>
+    </div>
+  </body>
+  <script>
+    $(document).ready(function () {
+      $.ajax({
+        type: "GET",
+        url: "http://localhost/covid19/api/getAllPatient.php",
+        dataType: "json",
+        success: function (data, status, xhr) {
+          //alert("capaian data ok");
+          var prettyContent = "<tr>";
+          for (let i = 0; i < data.length; i++) {
+            prettyContent += "<tr><td>" + data[i].id + "</td>";
+            prettyContent += "<td>" + data[i].patients_name + "</td>";
+            prettyContent += "<td>" + data[i].hospital_a_t + "</td>";
+            prettyContent += "<td>" + data[i].status + "</td>";
+            if (data[i].icu != null) {
+              prettyContent += "<td>" + data[i].icu + "</td>";
+            } else if (data[i].icu != null && data[i].discharge != null) {
+              prettyContent += "<td>" + data[i].discharge + "</td>";
+            } else if (data[i].icu != null && data[i].death != null) {
+              prettyContent += "<td>" + data[i].death + "</td>";
+            } else {
+              prettyContent += "<td>" + data[i].hospital_a_t + "</td>";
+            }
+
+            icu = "icu";
+            death = "death";
+            discharge = "discharge";
+            cdate = new Date(data[i].icu);
+            dates = [cdate.getDate(),(cdate.getMonth()+1),cdate.getFullYear()];
+            icdates = dates;
+
+            prettyContent += "<td>"+
+                "<a class='small btn btn-primary' href='display.html?id="+data[i].id+"'>View</a>"+
+                "<a class='small btn btn-info' href='update.html?id="+data[i].id+"'>Edit</a>"+
+                "<button class='small btn btn-warning' onclick='status("+data[i].id+","+icu+")'>ICU</button>"+
+                "<a class='small btn btn-danger' onclick='status("+data[i].id+","+death+","+icdates+")'>Death</a>"+
+                "<a class='small btn btn-success'onclick='status("+data[i].id+","+discharge+","+icdates+")'>Discharge</a>"+
+                "</td></tr>";
+          }
+          //prettyContent += "</tr>";
+          document.querySelector("#all_patient").innerHTML = prettyContent;
+        },
+
+        error: function () {
+          alert(status);
+        },
+      });
+    });
+
+    /**
+   * @param {string} dates - The date
+   */
+
+    function status(int,cond,date,month,year){
+      $(document).ready(function (event) {
+      var formData;
+      var today = new Date();
+      var yyyymmdd = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
+      
+      if(cond == "icu"){
+        formData = "icu="+yyyymmdd+"&status=ICU&death=null&discharge=null";
+      }
+      else if(cond == "death"){
+        formData = "death="+yyyymmdd+"&status=Death&discharge=null&icu="+year+"-"+month+"-"+date;
+      }
+      else if(cond == "discharge"){
+        formData = "discharge="+yyyymmdd+"&status=Discharge&death=null&icu="+year+"-"+month+"-"+date;
+        alert(dates);
+      }
+      
+      console.log(formData); // check using console to make sure all the form data values are correctly serialized
+
+      $.ajax({
+        type: "POST",
+        url: "http://localhost/covid19/api/updatePatientStat.php?id=" + int,
+        data: formData,
+        dataType: "json",
+
+        success: function (data, status, xhr) {
+          if (status == 'success') {
+            alert("ok, successfully add data");
+            //window.location.href = "index.html";
+          } else {
+              alert(status);
+            alert("fail to insert, " + data.errormessage);
+          }
+        },
+
+        error: function (xhr, resp, text) {
+          alert("error " + xhr.error + ", " + resp + ", " + text);
+          console.log(xhr.responseText);
+          console.log(resp);
+          console.log(text);
+        },
+      });
+    });
+    }
+  </script>
+</html>
