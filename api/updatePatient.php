@@ -13,7 +13,7 @@ $patients_sex = $_POST["patients_sex"];
 
 $sql = "UPDATE patients SET patients_name = :patients_name, 
 patients_age = :patients_age, 
-patients_sex = :patients_sex WHERE id = $id";
+patients_sex = :patients_sex WHERE id = $id"; //To edit and update data yg udh ada di table patient
 
 try {
     // Get DB Object

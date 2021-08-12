@@ -4,13 +4,13 @@ header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, DELETE");
 
 class db{
-    // Properties
+    // Properties (Inisiasi database tujuan)
     private $host = 'localhost';
     private $user = 'root';
     private $password = '';
-    private $dbname = 'covid-19';
+    private $dbname = 'testcovid19';
 
-    // Connect
+    // Connect (connecting to the database tujuan yg di tulis di atas)
     public function connect(){
         $mysql_connect_str = "mysql:host=$this->host;dbname=$this->dbname";
         $dbConnection = new PDO($mysql_connect_str, $this->user, $this->password);

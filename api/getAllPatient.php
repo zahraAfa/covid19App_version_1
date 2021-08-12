@@ -2,14 +2,14 @@
 
 header('Content-Type: application/json');
 
-require 'db.php';
+require 'db.php'; //Biar nyambung ke connection string databasenya
 
-$sql = "SELECT * FROM patients";
+$sql = "SELECT * FROM patients"; //To display all data from patient table
 
 try{
     $db = new db();
     // Connect
-    $db = $db->connect();
+    $db = $db->connect(); // harus konekin dulu tiap mau ngelakuin action ke database
 
     $stmt = $db->query($sql);
     $patient = $stmt->fetchAll(PDO::FETCH_OBJ);

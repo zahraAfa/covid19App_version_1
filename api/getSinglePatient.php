@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 require 'db.php';
 
 $id= $_GET["id"];
-$sql = "SELECT * FROM patients WHERE id = $id";
+$sql = "SELECT * FROM patients WHERE id = $id"; //To get or display a patient with specified id
 
 try{
     $db = new db();
